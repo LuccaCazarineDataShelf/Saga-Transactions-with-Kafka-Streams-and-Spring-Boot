@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package org.example.proto;
+
+option java_multiple_files = true;
+option java_package = "org.example.eventes";
+option java_outer_classname = "Protobuf";
+
+import "google/protobuf/timestamp.proto";
+
+enum OrderSide{
+  ORDER_SIDE_UNSPECIFIED = 0;
+  BUY = 1;
+  SELL = 2;
+}
+
+enum RejectionReason{
+  REJECTION_REASON_UNSPECIFIED = 0;
+  INSUFFICIENT_FUNDS = 1;
+  ASSET_UNAVAILABLE = 2;
+  SETTLEMENT_FAILED = 3;
+}
+
+message OrderCreated{
+  string orderId = 1;
+  string customerId = 2;
+  string assetCode = 3;
+  OrderSide orderSide = 4;
+  int32 quantity = 5;
+  int64 unitPriceCents = 6;
+  int64 totalPriceCents = 7;
+}
+
+message CashReserved{
+  string orderId = 1;
+  string costumerId = 2;
+  int64 amountCents = 3;
+}
+
+message CashReservationRejected{
+  string orderId = 1;
+  string costumerId = 2;
+  int64 requestedAmountCents = 3;
+  RejectionReason rejectionReason = 4;
+}
+
+message SagaEventInfo{
+  string eventId = 1;
+  string sagaId = 2;
+  google.protobuf.Timestamp occurredAt = 3;
+  oneof payload{
+    OrderCreated orderCreated = 10;
+    CashReserved cashReserved = 11;
+    CashReservationRejected cashReservationRejected = 12;
+  }
+}
